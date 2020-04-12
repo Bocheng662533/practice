@@ -1,0 +1,34 @@
+from qiskit import QuantumRegister, ClassicalRegister, QuantumCircuit, Aer, execute
+
+# half adder using Qiskit
+
+# creating a Quantum register with 4 Qubits and 2 classical bits
+q = QuantumRegister(4)
+c = ClassicalRegister(2)
+circuit= QuantumCircuit(q,c)
+
+# encode inputs in qubit0 & qubit1
+# in Qiskit each qubit starts as 0 state
+# applying X gate to change the starting value as 1
+#circuit.x(q[0])
+circuit.x(q[1])
+
+# use cnot gate to write the XOR of inputs
+circuit.cx(q[0],q[2])
+circuit.cx(q[1],q[2])
+# use ccx gate to write the AND of inputs
+circuit.ccx(q[0],q[1],q[3])
+  
+circuit.measure(q[2],c[0])
+circuit.measure(q[3],c[1])
+print(circuit)
+
+# connecting the backend (a simulator or real Quantum machine) to run the circuit
+simulator=Aer.get_backend('qasm_simulator')
+job=execute(circuit,simulator)
+
+# the output bitstring consists of a 2 collapsed Qubits
+result=job.result()
+output=result.get_counts()
+bitstring=list(output.keys())
+print(bitstring)
