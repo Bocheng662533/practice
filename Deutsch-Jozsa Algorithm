@@ -1,0 +1,31 @@
+import numpy as np
+from qiskit import IBMQ, BasicAer
+from qiskit.providers.ibmq import least_busy
+from qiskit import QuantumCircuit, execute
+from qiskit.visualization import plot_histogram
+# set the length of the n-bit input string.
+n = 3
+dj_circuit = QuantumCircuit(n+1, n)
+balanced_oracle = QuantumCircuit(n+1)
+# Apply H-gates
+for qubit in range(n):
+dj_circuit.h(qubit)
+# Put qubit in state |->
+dj_circuit.x(n)
+dj_circuit.h(n)
+# Add oracle
+dj_circuit += balanced_oracle
+# Repeat H-gates
+for qubit in range(n):
+dj_circuit.h(qubit)
+dj_circuit.barrier()
+# Measure
+for i in range(n):
+dj_circuit.measure(i, i)
+# Display circuit
+print(dj_circuit)
+backend = BasicAer.get_backend('qasm_simulator')
+shots = 1024
+results = execute(dj_circuit, backend=backend, shots=shots).result()
+answer = results.get_counts()
+print(answer)
